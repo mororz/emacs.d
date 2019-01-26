@@ -253,6 +253,11 @@
        :ensure t
        :after all-the-icons
        :hook (dired-mode . all-the-icons-dired-mode))
+
+     ;; fix regex
+     (use-package pcre2el
+       :ensure t
+       :config (pcre-mode))
    #+END_SRC
 
 ** Doom modeline
@@ -261,6 +266,16 @@
        :ensure t
        :defer t
        :hook (after-init . doom-modeline-init))
+   #+END_SRC
+
+** load path
+   #+BEGIN_SRC emacs-lisp
+     (add-to-list 'load-path "~/.emacs.d/code/")
+   #+END_SRC
+
+** prettify symbols
+   #+BEGIN_SRC emacs-lisp
+     (global-prettify-symbols-mode +1)
    #+END_SRC
 
 * General packages
@@ -352,11 +367,13 @@
    with smth more advanced
    #+BEGIN_SRC emacs-lisp
      (use-package auto-complete
-       :ensure t
-       :init
-       (progn
-         (ac-config-default)
-         (global-auto-complete-mode t)))
+       :ensure t)
+       ;; :init
+       ;; (progn
+         ;; (ac-config-default)))
+         ;; (global-auto-complete-mode t)
+
+
    #+END_SRC
 
 ** =smartparens=
@@ -368,7 +385,7 @@
    #+END_SRC
 
 ** =company=
-
+   
    Need company for =elpy=
    #+BEGIN_SRC emacs-lisp
      (use-package company
@@ -458,6 +475,26 @@
        :config (mode-icons-mode))
    #+END_SRC
 
+** =dashboard=
+   #+BEGIN_SRC emacs-lisp
+     (use-package dashboard
+       :ensure t
+       :config
+       (dashboard-setup-startup-hook))
+
+     ;; use forune utility for greetings
+     (setq dashboard-banner-logo-title (shell-command-to-string "fortune -a"))
+
+     (setq dashboard-items '((projects . 5)))
+
+   #+END_SRC
+
+** =rainbow-delimiters=
+   #+BEGIN_SRC emacs-lisp
+     (use-package rainbow-delimiters
+       :ensure t)
+   #+END_SRC
+
 * Org mode
 
   I love =org-mode=
@@ -513,6 +550,20 @@
     (setq org-ellipsis "↷")
   #+END_SRC
 
+  Python
+  #+BEGIN_SRC emacs-lisp
+    (org-babel-do-load-languages
+     'org-babel-load-languages
+     '((python . t)))
+  #+END_SRC
+
+  Scheme
+  #+BEGIN_SRC emacs-lisp
+    (org-babel-do-load-languages
+         'org-babel-load-languages
+         '((scheme . t)))
+  #+END_SRC
+
 * Proramming
 ** Python
 
@@ -530,7 +581,7 @@
      (setq python-indent-offset 4)
 
      (setq python-shell-interpreter "ipython"
-          python-shell-interpreter-args "-i --simple-prompt")
+           python-shell-interpreter-args "-i --simple-prompt")
 
      (when (require 'flycheck nil t)
        (setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
@@ -542,6 +593,53 @@
        (add-hook 'elpy-mode-hook 'py-autopep8-enable-on-save))
 
      (add-hook 'inferior-python-mode-hook 'auto-complete-mode-hook)
+
+     ;; use ml env by default
+     (pyvenv-workon 'ml)
+   #+END_SRC
+
+** Lisp
+   #+BEGIN_SRC emacs-lisp
+     ;; (use-package parinfer
+     ;;   :ensure t
+     ;;   :bind
+     ;;   (("C-," . parinfer-toggle-mode))
+     ;;   :init
+     ;;   (progn
+     ;;     (setq parinfer-extensions
+     ;;           '(defaults       ; should be included.
+     ;;             pretty-parens  ; different paren styles for different modes.
+     ;;             paredit        ; Introduce some paredit commands.
+     ;;             smart-tab      ; C-b & C-f jump positions and smart shift with tab & S-tab.
+     ;;             smart-yank))   ; Yank behavior depend on mode.
+     ;;     (add-hook 'clojure-mode-hook #'parinfer-mode)
+     ;;     (add-hook 'emacs-lisp-mode-hook #'parinfer-mode)
+     ;;     (add-hook 'common-lisp-mode-hook #'parinfer-mode)
+     ;;     (add-hook 'scheme-mode-hook #'parinfer-mode)
+     ;;     (add-hook 'lisp-mode-hook #'parinfer-mode)))
+
+     (use-package paredit
+       :ensure t)
+
+     (add-hook 'scheme-mode-hook #'paredit-mode)
+     (add-hook 'emacs-lisp-mode-hook #'paredit-mode)
+
+     (add-hook 'scheme-mode-hook #'rainbow-delimiters-mode)
+     (add-hook 'emacs-lisp-mode-hook #'rainbow-delimiters-mode)
+
+     ;; use geiser for Scheme
+     (use-package ac-geiser
+       :ensure t)
+
+     ;; (add-hook 'geiser-mode-hook 'ac-geiser-setup)
+     ;; (add-hook 'geiser-repl-mode-hook 'ac-geiser-setup)
+     ;; (eval-after-load "auto-complete"
+     ;;   '(add-to-list 'ac-modes 'geiser-repl-mode))
+
+     (use-package geiser
+       :ensure t)
+
+     (setq geiser-active-implementations '(guile))
    #+END_SRC
 
 * Other bindings
