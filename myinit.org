@@ -2,6 +2,7 @@
 #+TITLE: My emacs init file
 #+STARTUP: overview
 #+OPTIONS: num:nil toc:nil
+#+LATEX_HEADER: \usepackage[utf8]{inputenc}
 
 * Personal information
   #+BEGIN_SRC emacs-lisp
@@ -56,8 +57,8 @@
 
 ** Transparency
   #+BEGIN_SRC emacs-lisp
-    (set-frame-parameter (selected-frame) 'alpha '(95 . 50))
-     (add-to-list 'default-frame-alist '(alpha . (85 . 50)))
+    (set-frame-parameter (selected-frame) 'alpha '(95 . 80))
+     (add-to-list 'default-frame-alist '(alpha . (85 . 80)))
   #+END_SRC
 
 ** Lock font wherever possible
@@ -113,74 +114,6 @@
       "Kill the current buffer without prompting."
       (interactive)
       (kill-buffer (current-buffer)))
-  #+END_SRC
-
-** Powerline
-  #+BEGIN_SRC emacs-lisp
-    ;; (defun powerline-mine-theme ()
-    ;;   "Setup the default mode-line."
-    ;;   (interactive)
-    ;;   (setq-default mode-line-format
-    ;;                 '("%e"
-    ;;                   (:eval
-    ;;                    (let* ((active (powerline-selected-window-active))
-    ;;                           (mode-line-buffer-id (if active 'mode-line-buffer-id 'mode-line-buffer-id-inactive))
-    ;;                           (mode-line (if active 'mode-line 'mode-line-inactive))
-    ;;                           (face0 (if active 'powerline-active0 'powerline-inactive0))
-    ;;                           (face1 (if active 'powerline-active1 'powerline-inactive1))
-    ;;                           (face2 (if active 'powerline-active2 'powerline-inactive2))
-    ;;                           (separator-left (intern (format "powerline-%s-%s"
-    ;;                                                           (powerline-current-separator)
-    ;;                                                           (car powerline-default-separator-dir))))
-    ;;                           (separator-right (intern (format "powerline-%s-%s"
-    ;;                                                            (powerline-current-separator)
-    ;;                                                            (cdr powerline-default-separator-dir))))
-    ;;                           (lhs (list (powerline-raw "%*" face0 'l)
-    ;;                                      (when powerline-display-buffer-size
-    ;;                                        (powerline-buffer-size face0 'l))
-    ;;                                      (when powerline-display-mule-info
-    ;;                                        (powerline-raw mode-line-mule-info face0 'l))
-    ;;                                      (powerline-buffer-id `(mode-line-buffer-id ,face0) 'l)
-    ;;                                      (when (and (boundp 'which-func-mode) which-func-mode)
-    ;;                                        (powerline-raw which-func-format face0 'l))
-    ;;                                      (powerline-raw " " face0)
-    ;;                                      (funcall separator-left face0 face1)
-    ;;                                      (when (and (boundp 'erc-track-minor-mode) erc-track-minor-mode)
-    ;;                                        (powerline-raw erc-modified-channels-object face1 'l))
-    ;;                                      (powerline-major-mode face1 'l)
-    ;;                                      (powerline-process face1)
-    ;;                                      (powerline-narrow face1 'l)
-    ;;                                      (powerline-raw " " face1)
-    ;;                                      (funcall separator-left face1 face2)
-    ;;                                      (powerline-vc face2 'r)
-
-    ;;                                      (powerline-raw global-mode-string face2 'r)
-    ;;                                      (funcall separator-left face2 face1)
-    ;;                                      (unless window-system
-    ;;                                        (powerline-raw (char-to-string #xe0a1) face1 'l))
-    ;;                                      (powerline-raw "%3l" face1 'l)
-    ;;                                      (powerline-raw ":" face1 'l)
-    ;;                                      (powerline-raw "%3c" face1 'r)
-    ;;                                      (funcall separator-left face1 face0)
-    ;;                                      (powerline-raw " " face0)
-    ;;                                      (powerline-raw "%3p" face0 'r)
-    ;;                                      ;; (when (bound-and-true-p nyan-mode)
-    ;;                                      ;;   (powerline-raw (list (nyan-create)) face2 'l))
-    ;;                                      (when (projectile-project-p (expand-file-name "."))
-    ;;                                        (funcall separator-left face0 face1))
-    ;;                                      (when (projectile-project-p (expand-file-name "."))
-    ;;                                          (powerline-raw projectile--mode-line face1 'r))
-    ;;                                      ))
-    ;;                           (rhs (list )))
-    ;;                      (concat (powerline-render lhs)
-    ;;                              (powerline-fill face2 (powerline-width rhs))
-    ;;                              (powerline-render rhs)))))))
-
-
-    ;; (use-package powerline
-    ;;   :ensure t
-    ;;   :config
-    ;;   (powerline-mine-theme))
   #+END_SRC
 
 ** wttr for weather
@@ -495,6 +428,15 @@
        :ensure t)
    #+END_SRC
 
+** =evil-mode=
+   
+   #+BEGIN_SRC emacs-lisp
+     (use-package evil
+       :ensure t
+     ;;  :config (evil-mode 1)
+       )
+   #+END_SRC
+
 * Org mode
 
   I love =org-mode=
@@ -547,7 +489,7 @@
 
   Change ellipsis
   #+BEGIN_SRC emacs-lisp
-    (setq org-ellipsis "↷")
+    ;; (setq org-ellipsis "...")
   #+END_SRC
 
   Python
@@ -562,6 +504,23 @@
     (org-babel-do-load-languages
          'org-babel-load-languages
          '((scheme . t)))
+  #+END_SRC
+
+  Unicode
+  #+BEGIN_SRC emacs-lisp
+    (setq org-latex-inputenc-alist '(("utf8" . "utf8x")))
+  #+END_SRC
+
+  Nice code highlightning in pdfs
+  #+BEGIN_SRC emacs-lisp
+    (require 'ox-latex)
+    (add-to-list 'org-latex-packages-alist '("" "minted"))
+    (setq org-latex-listings 'minted)
+
+    (setq org-latex-pdf-process
+          '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+            "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+            "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
   #+END_SRC
 
 * Proramming
@@ -598,26 +557,14 @@
      (pyvenv-workon 'ml)
    #+END_SRC
 
+   Jupyter notebooks for emacs
+   #+BEGIN_SRC emacs-lisp
+     (use-package ein
+       :ensure t)
+   #+END_SRC
+
 ** Lisp
    #+BEGIN_SRC emacs-lisp
-     ;; (use-package parinfer
-     ;;   :ensure t
-     ;;   :bind
-     ;;   (("C-," . parinfer-toggle-mode))
-     ;;   :init
-     ;;   (progn
-     ;;     (setq parinfer-extensions
-     ;;           '(defaults       ; should be included.
-     ;;             pretty-parens  ; different paren styles for different modes.
-     ;;             paredit        ; Introduce some paredit commands.
-     ;;             smart-tab      ; C-b & C-f jump positions and smart shift with tab & S-tab.
-     ;;             smart-yank))   ; Yank behavior depend on mode.
-     ;;     (add-hook 'clojure-mode-hook #'parinfer-mode)
-     ;;     (add-hook 'emacs-lisp-mode-hook #'parinfer-mode)
-     ;;     (add-hook 'common-lisp-mode-hook #'parinfer-mode)
-     ;;     (add-hook 'scheme-mode-hook #'parinfer-mode)
-     ;;     (add-hook 'lisp-mode-hook #'parinfer-mode)))
-
      (use-package paredit
        :ensure t)
 
@@ -640,6 +587,48 @@
        :ensure t)
 
      (setq geiser-active-implementations '(guile))
+
+     (add-hook 'geiser-repl-mode-hook #'paredit-mode)
+     (add-hook 'geiser-repl-mode-hook #'rainbow-delimiters-mode)
+   #+END_SRC
+
+** R
+
+   Use ESS for R development
+   #+BEGIN_SRC emacs-lisp
+     (use-package ess
+       :ensure t)
+   #+END_SRC
+
+   Basic configuration for editing
+   #+BEGIN_SRC emacs-lisp
+     (add-hook 'ess-mode-hook #'auto-complete-mode)
+     (add-hook 'ess-mode-hook #'smartparens-mode)
+     (add-hook 'ess-mode-hook #'rainbow-delimiters-mode)
+     
+     (add-hook 'inferior-ess-mode-hook #'auto-complete-mode)
+     (add-hook 'inferior-ess-mode-hook #'smartparens-mode)
+     (add-hook 'inferior-ess-mode-hook #'rainbow-delimiters-mode)
+
+     (defun myindent-ess-hook ()
+       (setq ess-indent-level 2))
+     (add-hook 'ess-mode-hook 'myindent-ess-hook)
+   #+END_SRC
+
+** C
+
+   #+BEGIN_SRC emacs-lisp
+     (use-package irony
+       :ensure t)
+
+     (add-hook 'c-mode-hook 'irony-mode)
+     (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options)
+
+     (setq-default c-basic-offset 8 c-default-style "linux")
+
+     (add-hook 'c-mode-hook #'auto-complete-mode)
+     (add-hook 'c-mode-hook #'smartparens-mode)
+     (add-hook 'c-mode-hook #'rainbow-delimiters-mode)
    #+END_SRC
 
 * Other bindings
