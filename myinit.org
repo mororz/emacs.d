@@ -437,6 +437,13 @@
        )
    #+END_SRC
 
+** =pdf-tools=
+   
+   #+BEGIN_SRC emacs-lisp
+     (use-package pdf-tools
+       :ensure t)
+   #+END_SRC
+
 * Org mode
 
   I love =org-mode=
@@ -591,6 +598,30 @@
      (add-hook 'geiser-repl-mode-hook #'paredit-mode)
      (add-hook 'geiser-repl-mode-hook #'rainbow-delimiters-mode)
    #+END_SRC
+
+*** Common lisp
+    #+BEGIN_SRC emacs-lisp
+      ;;Load Quicklisp slime-helper
+      (load (expand-file-name "~/quicklisp/slime-helper.el"))
+      (setq inferior-lisp-program "sbcl")
+
+      (add-hook 'lisp-mode-hook #'paredit-mode)
+      (add-hook 'lisp-mode-hook #'rainbow-delimiters-mode)
+
+      (use-package ac-slime
+        :ensure t)
+
+      (add-hook 'slime-mode-hook 'set-up-slime-ac)
+      (add-hook 'slime-repl-mode-hook 'set-up-slime-ac)
+      (eval-after-load "auto-complete"
+        '(add-to-list 'ac-modes 'slime-repl-mode))
+
+      (add-hook 'lisp-mode-hook #'auto-complete-mode)
+
+      (add-hook 'slime-repl-mode-hook #'paredit-mode)
+      (add-hook 'slime-repl-mode-hook #'rainbow-delimiters-mode)
+      (add-hook 'slime-repl-mode-hook #'auto-complete-mode)
+    #+END_SRC
 
 ** R
 
