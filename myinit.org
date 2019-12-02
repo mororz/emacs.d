@@ -70,9 +70,9 @@
   I love it very much, but it doesn't fit very nice
   when frame is split
   #+BEGIN_SRC emacs-lisp
-       (use-package nyan-mode
-         :ensure t
-         :init (nyan-mode t))
+    ;; (use-package nyan-mode
+    ;;   :ensure t
+    ;;   :init (nyan-mode t))
   #+END_SRC
 
 ** Overwrite selected text
@@ -129,7 +129,7 @@
 ** Find this file quickly
 
    #+BEGIN_SRC emacs-lisp
-     (global-set-key (kbd "\e\ec") (lambda () (interactive) (find-file "~/.emacs.d/myinit.org")))
+     (global-set-key (kbd "\e\ei") (lambda () (interactive) (find-file "~/.emacs.d/myinit.org")))
    #+END_SRC
 
 ** Change windosws size with nice keys
@@ -208,7 +208,12 @@
 
 ** prettify symbols
    #+BEGIN_SRC emacs-lisp
-     (global-prettify-symbols-mode +1)
+     ;; (global-prettify-symbols-mode +1)
+   #+END_SRC
+
+** Auto revert buffers
+   #+BEGIN_SRC emacs-lisp
+     (global-auto-revert-mode t)
    #+END_SRC
 
 * General packages
@@ -431,16 +436,25 @@
 ** =evil-mode=
    
    #+BEGIN_SRC emacs-lisp
-     (use-package evil
-       :ensure t
-     ;;  :config (evil-mode 1)
-       )
+     ;; (use-package evil
+     ;;   :ensure t
+     ;;   :config (evil-mode 1)
+     ;;   )
    #+END_SRC
 
 ** =pdf-tools=
    
    #+BEGIN_SRC emacs-lisp
      (use-package pdf-tools
+       :ensure t)
+   #+END_SRC
+
+** =wide-column=
+
+** =sr-speedbar=
+
+   #+BEGIN_SRC emacs-lisp
+     (use-package sr-speedbar
        :ensure t)
    #+END_SRC
 
@@ -475,11 +489,11 @@
 
   Set up auto completion for =org-mode=
   #+BEGIN_SRC emacs-lisp
-    (use-package org-ac
-      :ensure t
-      :init (progn
-              (require 'org-ac)
-              (org-ac/config-default)))
+    ;; (use-package org-ac
+    ;;   :ensure t
+    ;;   :init (progn
+    ;;           (require 'org-ac)
+    ;;           (org-ac/config-default)))
   #+END_SRC
 
   Set keys
@@ -544,6 +558,8 @@
    #+BEGIN_SRC emacs-lisp
      (add-hook 'python-mode-hook #'smartparens-mode)
 
+     (add-hook 'inferior-python-mode #'smartparens-mode)
+
      (setq python-indent-offset 4)
 
      (setq python-shell-interpreter "ipython"
@@ -551,7 +567,8 @@
 
      (when (require 'flycheck nil t)
        (setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
-       (add-hook 'elpy-mode-hook 'flycheck-mode))
+       (add-hook 'elpy-mode-hook 'flycheck-mode)
+       (add-hook 'inferior-python-mode-hook 'flycheck-mode))
 
      (use-package py-autopep8
        :ensure t
@@ -568,6 +585,11 @@
    #+BEGIN_SRC emacs-lisp
      (use-package ein
        :ensure t)
+   #+END_SRC
+
+   Turning off python native completion
+   #+BEGIN_SRC emacs-lisp
+     (setq python-shell-completion-native nil)
    #+END_SRC
 
 ** Lisp
@@ -636,7 +658,7 @@
      (add-hook 'ess-mode-hook #'auto-complete-mode)
      (add-hook 'ess-mode-hook #'smartparens-mode)
      (add-hook 'ess-mode-hook #'rainbow-delimiters-mode)
-     
+
      (add-hook 'inferior-ess-mode-hook #'auto-complete-mode)
      (add-hook 'inferior-ess-mode-hook #'smartparens-mode)
      (add-hook 'inferior-ess-mode-hook #'rainbow-delimiters-mode)
@@ -644,22 +666,77 @@
      (defun myindent-ess-hook ()
        (setq ess-indent-level 2))
      (add-hook 'ess-mode-hook 'myindent-ess-hook)
-   #+END_SRC
 
-** C
-
-   #+BEGIN_SRC emacs-lisp
-     (use-package irony
+     (use-package
+       ess-R-data-view
        :ensure t)
 
-     (add-hook 'c-mode-hook 'irony-mode)
-     (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options)
+     (use-package
+       ess-smart-underscore
+       :ensure t)
+   #+END_SRC
 
+** C/C++
+
+   #+BEGIN_SRC emacs-lisp
      (setq-default c-basic-offset 8 c-default-style "linux")
 
-     (add-hook 'c-mode-hook #'auto-complete-mode)
      (add-hook 'c-mode-hook #'smartparens-mode)
      (add-hook 'c-mode-hook #'rainbow-delimiters-mode)
+
+
+     (add-hook 'c++-mode-hook 'irony-mode)
+     (add-hook 'c-mode-hook 'irony-mode)
+     (add-hook 'objc-mode-hook 'irony-mode)
+
+     (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options)
+
+     (add-hook 'c-mode-hook #'company-mode)
+
+     (eval-after-load 'company
+       '(add-to-list 'company-backends 'company-irony))
+
+     (add-hook 'c-mode-hook #'flycheck-mode)
+
+     (eval-after-load 'flycheck
+       '(add-hook 'flycheck-mode-hook #'flycheck-irony-setup))
+
+     (add-hook 'irony-mode-hook #'irony-eldoc)
+   #+END_SRC
+
+** Coq
+
+   #+BEGIN_SRC emacs-lisp
+     (use-package proof-general
+       :ensure t)
+   #+END_SRC
+
+** Haskell
+   
+   #+BEGIN_SRC emacs-lisp
+     (use-package intero
+       :ensure t
+       :config (intero-global-mode 1))
+   #+END_SRC
+
+   #+BEGIN_SRC emacs-lisp
+     (add-hook 'haskell-mode-hook #'smartparens-mode)
+   #+END_SRC
+
+** Latex
+
+   #+BEGIN_SRC emacs-lisp
+     (setq TeX-auto-save t)
+     (setq TeX-parse-self t)
+     (setq-default TeX-master nil)
+
+     (setq-default TeX-engine 'xetex)
+
+     (setq TeX-electric-math (cons "$" "$"))
+
+     (setq LaTeX-electric-left-right-brace t)
+
+     (setq TeX-complete-expert-commands t)
    #+END_SRC
 
 * Other bindings
@@ -667,4 +744,5 @@
     (global-set-key (kbd "\e\es") (lambda () (interactive) (find-file "~/org/ds.org")))
     (global-set-key (kbd "<f8>") 'project-explorer-toggle)
     (global-set-key (kbd "M-;") 'comment-line)
+    (global-set-key (kbd "\e\ec") 'compile)
   #+END_SRC
